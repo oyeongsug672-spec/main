@@ -20,4 +20,5 @@ rad.json
 *.bclicense
 *.flf
 #Test results file
-TestResults.xml
+TestResults.xml__pycache__/
+hangul_short/music.wav
