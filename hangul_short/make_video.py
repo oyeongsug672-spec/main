@@ -20,6 +20,17 @@ FONT_ROUND = HERE / "fonts" / "Jua-Regular.ttf"
 FONT_BOLD = HERE / "fonts" / "BlackHanSans-Regular.ttf"
 OUT = HERE / "hangul_short.mp4"
 AUDIO = HERE / "music.wav"
+VOICE = ROOT / "자음모음음성.m4a"
+# 녹음 파일에서 잘라 쓸 구간: (원본 시작, 원본 끝, 영상에서 재생할 시각)
+VOICE_CLIPS = [
+    (0.30, 3.10, 0.15),                     # 인트로 인사
+    (3.45, 4.10, 3.40),                     # 가
+    (5.05, 5.95, 5.40),                     # 나
+    (6.95, 7.60, 7.40),                     # 다
+    (8.85, 9.45, 9.40),                     # 라
+    (10.80, 11.60, 11.40),                  # 마
+    (11.60, 13.60, 12.85),                  # 마무리 인사
+]
 
 W, H, FPS, DUR = 1080, 1920, 30, 15.0
 BPM = 120
@@ -268,10 +279,10 @@ def scene_outro(t):
         draw_text(img, les[2], x, 1392, 120 * pi, PURPLE, FONT_BOLD)
         draw_text(img, les[5], x, 1530, 50 * pi, WHITE, stroke=4, stroke_fill=INK)
 
-    p3 = ease_out_back((t - 1.0) / 0.4)
+    p3 = ease_out_back((t - 0.4) / 0.4)
     draw_text(img, "쉽죠? Easy, right?", W / 2, 1660, 80 * p3, (255, 230, 120),
               FONT_BOLD, 7, INK)
-    p4 = ease_out_back((t - 1.4) / 0.4)
+    p4 = ease_out_back((t - 1.2) / 0.4)
     rounded_card(img, W / 2, 1810, 620 * p4, 110 * p4, 55, PINK_DARK, WHITE, 5)
     draw_text(img, "Follow for more!", W / 2, 1810, 64 * p4, WHITE)
     return img
@@ -293,6 +304,31 @@ SR = 44100
 def note_freq(n):
     """MIDI 번호 -> Hz"""
     return 440.0 * 2 ** ((n - 69) / 12)
+
+
+def load_voice(n):
+    """녹음 파일을 잡음 제거·음량 정리 후 VOICE_CLIPS 위치에 배치."""
+    track = np.zeros(n)
+    if not VOICE.exists():
+        return track
+    ff = imageio_ffmpeg.get_ffmpeg_exe()
+    raw = subprocess.run(
+        [ff, "-loglevel", "error", "-i", str(VOICE),
+         "-af", "highpass=f=90,afftdn=nf=-30,acompressor=threshold=-20dB:ratio=3:"
+                "attack=5:release=80,equalizer=f=3000:t=q:w=1:g=3",
+         "-ac", "1", "-ar", str(SR), "-f", "f32le", "-"],
+        capture_output=True, check=True).stdout
+    v = np.frombuffer(raw, dtype=np.float32).astype(float)
+    v /= np.max(np.abs(v)) + 1e-9
+    fade = int(0.03 * SR)
+    for a, b, dst in VOICE_CLIPS:
+        clip = v[int(a * SR):int(b * SR)].copy()
+        clip[:fade] *= np.linspace(0, 1, fade)
+        clip[-fade:] *= np.linspace(1, 0, fade)
+        i = int(dst * SR)
+        clip = clip[: max(0, n - i)]
+        track[i:i + len(clip)] += clip * 0.95
+    return track
 
 
 def make_music():
@@ -390,7 +426,15 @@ def make_music():
         add(pop(650), s)
         add(pop(900), s + 0.5)
         add(sparkle(), s + 1.0)
-    add(sparkle(), OUTRO_START + 1.0)
+    add(sparkle(), OUTRO_START + 0.4)
+
+    # 목소리 트랙 + 목소리가 나올 때 음악 줄이기(더킹)
+    out /= np.max(np.abs(out)) + 1e-9
+    voice = load_voice(n)
+    active = np.convolve((np.abs(voice) > 0.02).astype(float),
+                         np.ones(int(0.25 * SR)) / int(0.25 * SR), mode="same")
+    duck = 1 - 0.6 * np.clip(active * 4, 0, 1)
+    out = out * 0.55 * duck + voice
 
     # 끝부분 페이드아웃 + 정규화
     fade = int(0.6 * SR)
