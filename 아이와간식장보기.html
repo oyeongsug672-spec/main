@@ -1,0 +1,289 @@
+<title>아이와 간식 장보기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
+<style>
+  :root{
+    --sky:#E4F3FB; --wall:#CFEAF7; --wood:#C98B4F; --wood-dark:#9C6435;
+    --floor-a:#F6E7C8; --floor-b:#EDD6AA; --ink:#3A2A24; --berry:#EE5A72;
+    --mint:#7FD1B9; --butter:#FFD25E; --paper:#FFFFFF; --muted:#6B5A52;
+    color-scheme: light;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--sky);color:var(--ink);font-family:"Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic",sans-serif;font-size:16px;padding-inline:16px;padding-block:20px 40px}
+  .wrap{max-width:920px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+  h1{font-family:"Jua","Apple SD Gothic Neo",sans-serif;font-weight:400;font-size:clamp(28px,5vw,40px);margin:0;text-wrap:balance}
+  .sub{margin:0;color:var(--muted);line-height:1.6}
+
+  .stage{position:relative;width:100%;aspect-ratio:16/10;border-radius:18px;overflow:hidden;background:var(--wall);container-type:inline-size;border:3px solid var(--ink);user-select:none}
+  .sign{position:absolute;left:50%;top:3%;transform:translateX(-50%);background:var(--berry);color:#fff;font-family:"Jua",sans-serif;font-size:3.4cqw;padding:.6cqw 2.6cqw;border-radius:1.4cqw;border:.35cqw solid var(--ink);white-space:nowrap}
+  .shelf{position:absolute;left:3%;right:3%;height:2.2%;background:var(--wood);border-bottom:.6cqw solid var(--wood-dark);border-radius:.4cqw}
+  .shelf.s1{top:40%}
+  .floor{position:absolute;left:0;right:0;bottom:0;height:24%;background:repeating-conic-gradient(var(--floor-a) 0 25%,var(--floor-b) 0 50%) 0 0/6cqw 6cqw;border-top:.4cqw solid var(--ink)}
+  .tag{position:absolute;top:43.5%;transform:translateX(-50%);font-family:"Jua",sans-serif;font-size:2.2cqw;background:var(--paper);border:.25cqw solid var(--ink);border-radius:.8cqw;padding:.1cqw 1cqw;white-space:nowrap}
+  .item{position:absolute;width:11cqw;height:11cqw;transform:translate(-50%,-100%);top:40%;cursor:pointer;transition:transform .75s cubic-bezier(.3,.7,.3,1),opacity .3s}
+  .item svg{width:100%;height:100%;display:block;filter:drop-shadow(0 .4cqw 0 rgba(58,42,36,.18))}
+  .item:hover svg{transform:translateY(-4%)}
+  .item.gone{opacity:0;pointer-events:none}
+  .item.glow svg{animation:wiggle .5s ease-in-out 2}
+  @keyframes wiggle{0%,100%{transform:rotate(0)}30%{transform:rotate(-9deg)}70%{transform:rotate(9deg)}}
+
+  .kid{position:absolute;bottom:5%;left:12%;width:15cqw;height:25cqw;transform:translateX(-50%);transition:left 1.1s ease-in-out}
+  .kid .flip{width:100%;height:100%;transition:transform .2s}
+  .kid.left .flip{transform:scaleX(-1)}
+  .kid svg{width:100%;height:100%;display:block;overflow:visible}
+  .kid.walking .body{animation:bob .28s ease-in-out infinite alternate}
+  .kid.walking .legL{animation:step .28s ease-in-out infinite alternate}
+  .kid.walking .legR{animation:step .28s ease-in-out infinite alternate-reverse}
+  @keyframes bob{to{transform:translateY(-3px)}}
+  @keyframes step{from{transform:rotate(-14deg)}to{transform:rotate(14deg)}}
+  .legL{transform-origin:52px 150px}.legR{transform-origin:68px 150px}
+  .armR{transform-origin:78px 102px;transition:transform .4s ease}
+  .kid.reach .armR{transform:rotate(-150deg)}
+  .kid.happy .mouth{d:path("M50 72 Q60 84 70 72 Z")}
+  .basket{position:absolute;left:18%;right:18%;bottom:24%;height:14%;display:flex;justify-content:center;align-items:flex-end;gap:0;pointer-events:none}
+  .basket .mini{width:5cqw;height:5cqw;margin-inline:-1.4cqw;animation:pop .35s ease-out}
+  .basket .mini svg{width:100%;height:100%}
+  @keyframes pop{from{transform:scale(.2)}to{transform:scale(1)}}
+
+  .bubble{position:absolute;bottom:31cqw;left:12%;transform:translateX(-50%);background:var(--paper);border:.35cqw solid var(--ink);border-radius:2cqw;padding:1cqw 2.2cqw;font-family:"Jua",sans-serif;font-size:3cqw;white-space:nowrap;transition:left 1.1s ease-in-out,opacity .25s;opacity:0}
+  .bubble.show{opacity:1}
+  .bubble::after{content:"";position:absolute;left:50%;bottom:-1.6cqw;width:2.4cqw;height:2.4cqw;background:var(--paper);border-right:.35cqw solid var(--ink);border-bottom:.35cqw solid var(--ink);transform:translateX(-50%) rotate(45deg)}
+
+  .word{position:absolute;right:3%;top:52%;text-align:right;font-family:"Jua",sans-serif;pointer-events:none;opacity:0;transform:scale(.8);transition:opacity .3s,transform .3s}
+  .word.show{opacity:1;transform:scale(1)}
+  .word b{display:block;font-weight:400;font-size:8cqw;color:var(--berry);-webkit-text-stroke:.3cqw var(--ink);paint-order:stroke fill;line-height:1.05}
+  .word span{font-size:3cqw;color:var(--ink);background:var(--butter);border-radius:1cqw;padding:.2cqw 1.2cqw}
+
+  .cover{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2cqw;background:rgba(255,255,255,.55);backdrop-filter:blur(2px)}
+  .cover[hidden]{display:none!important}
+  .cover p{margin:0;font-family:"Jua",sans-serif;font-size:4cqw;text-align:center}
+  .bigplay{font-family:"Jua",sans-serif;font-size:4cqw;background:var(--berry);color:#fff;border:.4cqw solid var(--ink);border-radius:99px;padding:1.2cqw 4.5cqw;cursor:pointer;box-shadow:0 .6cqw 0 var(--ink)}
+  .bigplay:active{transform:translateY(.4cqw);box-shadow:0 .2cqw 0 var(--ink)}
+
+  .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+  .btn{font-family:"Jua",sans-serif;font-size:18px;border:2px solid var(--ink);border-radius:12px;padding:8px 16px;background:var(--paper);color:var(--ink);cursor:pointer;box-shadow:0 3px 0 var(--ink)}
+  .btn.primary{background:var(--berry);color:#fff}
+  .btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
+  .btn:focus-visible,.bigplay:focus-visible,.item:focus-visible,.chip:focus-visible{outline:3px solid var(--mint);outline-offset:3px}
+  .hint{color:var(--muted);font-size:14px}
+
+  .cart{display:flex;flex-direction:column;gap:8px}
+  .cart h2{font-family:"Jua",sans-serif;font-weight:400;font-size:22px;margin:0}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;min-height:48px}
+  .chip{display:flex;align-items:center;gap:6px;border:2px solid var(--ink);background:var(--paper);border-radius:99px;padding:4px 12px 4px 6px;font-family:"Jua",sans-serif;font-size:18px;cursor:pointer;color:var(--ink)}
+  .chip svg{width:30px;height:30px}
+  .empty{color:var(--muted);align-self:center}
+
+  @media (prefers-reduced-motion: reduce){
+    .kid,.bubble,.item{transition-duration:.01s!important}
+    .kid.walking .body,.kid.walking .legL,.kid.walking .legR,.item.glow svg{animation:none}
+  }
+</style>
+
+<div class="wrap">
+  <div>
+    <h1>아이와 간식 장보기</h1>
+    <p class="sub">민지가 과자가게에서 과자, 젤리, 아이스크림, 사탕, 초콜릿을 하나씩 장바구니에 담아요. 소리를 켜면 이름을 읽어 줘요.</p>
+  </div>
+
+  <div class="stage" id="stage">
+    <div class="sign">🛒 우리 동네 과자가게</div>
+    <div class="shelf s1"></div>
+    <div id="shelfItems"></div>
+    <div class="floor"></div>
+
+    <div class="kid" id="kid">
+      <div class="flip">
+        <svg viewBox="0 0 120 200" aria-label="장바구니를 든 아이">
+          <g class="legL"><rect x="47" y="148" width="11" height="38" rx="5" fill="#FFD9B8"/><ellipse cx="51" cy="188" rx="10" ry="6" fill="#EE5A72" stroke="#3A2A24" stroke-width="2.5"/></g>
+          <g class="legR"><rect x="62" y="148" width="11" height="38" rx="5" fill="#FFD9B8"/><ellipse cx="69" cy="188" rx="10" ry="6" fill="#EE5A72" stroke="#3A2A24" stroke-width="2.5"/></g>
+          <g class="body">
+            <path d="M40 152 L48 96 H72 L80 152 Z" fill="#FFD25E" stroke="#3A2A24" stroke-width="3" stroke-linejoin="round"/>
+            <circle cx="60" cy="118" r="3" fill="#EE5A72"/><circle cx="52" cy="136" r="3" fill="#EE5A72"/><circle cx="68" cy="138" r="3" fill="#EE5A72"/>
+            <g class="armR"><rect x="74" y="98" width="9" height="34" rx="4.5" fill="#FFD9B8" stroke="#3A2A24" stroke-width="2.5"/></g>
+            <!-- basket held by the left arm -->
+            <rect x="37" y="98" width="9" height="30" rx="4.5" fill="#FFD9B8" stroke="#3A2A24" stroke-width="2.5" transform="rotate(12 41 100)"/>
+            <path d="M24 128 Q36 104 50 128" fill="none" stroke="#9C6435" stroke-width="4"/>
+            <path d="M18 128 H56 L51 152 H23 Z" fill="#C98B4F" stroke="#3A2A24" stroke-width="3" stroke-linejoin="round"/>
+            <path d="M22 136 H53 M24 144 H51" stroke="#9C6435" stroke-width="2"/>
+            <!-- head -->
+            <circle cx="30" cy="46" r="11" fill="#3B2A25"/><circle cx="90" cy="46" r="11" fill="#3B2A25"/>
+            <circle cx="36" cy="40" r="4" fill="#EE5A72"/><circle cx="84" cy="40" r="4" fill="#EE5A72"/>
+            <rect x="54" y="84" width="12" height="14" fill="#FFD9B8"/>
+            <circle cx="60" cy="56" r="30" fill="#FFD9B8" stroke="#3A2A24" stroke-width="3"/>
+            <path d="M30 54 Q32 24 60 24 Q88 24 90 54 Q78 38 60 40 Q44 38 30 54 Z" fill="#3B2A25"/>
+            <circle cx="49" cy="60" r="4" fill="#3A2A24"/><circle cx="71" cy="60" r="4" fill="#3A2A24"/>
+            <circle cx="50.5" cy="58.5" r="1.3" fill="#fff"/><circle cx="72.5" cy="58.5" r="1.3" fill="#fff"/>
+            <ellipse cx="42" cy="70" rx="5" ry="3" fill="#F7A3A8"/><ellipse cx="78" cy="70" rx="5" ry="3" fill="#F7A3A8"/>
+            <path class="mouth" d="M53 73 Q60 79 67 73" fill="#EE5A72" stroke="#3A2A24" stroke-width="2.5" stroke-linecap="round"/>
+          </g>
+        </svg>
+        <div class="basket" id="basket"></div>
+      </div>
+    </div>
+
+    <div class="bubble" id="bubble">안녕!</div>
+    <div class="word" id="word"><b id="wordBig">과자</b><span id="wordSub">바삭바삭</span></div>
+
+    <div class="cover" id="cover">
+      <p>민지랑 간식 사러 가요!</p>
+      <button class="bigplay" id="bigPlay" type="button">▶ 시작하기</button>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn primary" id="playBtn" type="button">▶ 처음부터</button>
+    <button class="btn" id="soundBtn" type="button" aria-pressed="true">🔊 소리 켜짐</button>
+    <span class="hint">진열대의 간식을 눌러서 직접 담을 수도 있어요.</span>
+  </div>
+
+  <section class="cart">
+    <h2>민지의 장바구니</h2>
+    <div class="chips" id="chips"><span class="empty">아직 비어 있어요.</span></div>
+  </section>
+</div>
+
+<script>
+(function(){
+  const ART = {
+    snack:`<svg viewBox="0 0 100 100"><path d="M22 14 L78 14 L74 22 L80 86 L74 94 L26 94 L20 86 L26 22 Z" fill="#FFC93C" stroke="#3A2A24" stroke-width="4" stroke-linejoin="round"/><path d="M22 14 l4 5 l4 -5 l4 5 l4 -5 l4 5 l4 -5 l4 5 l4 -5 l4 5 l4 -5 l4 5 l4 -5 l4 5" fill="none" stroke="#3A2A24" stroke-width="2"/><rect x="24" y="40" width="52" height="22" fill="#EE5A72"/><text x="50" y="57" text-anchor="middle" font-family="Jua,sans-serif" font-size="16" fill="#fff">과자</text><circle cx="38" cy="76" r="7" fill="#E7A24A" stroke="#3A2A24" stroke-width="2"/><circle cx="60" cy="78" r="6" fill="#E7A24A" stroke="#3A2A24" stroke-width="2"/></svg>`,
+    jelly:`<svg viewBox="0 0 100 100"><g stroke="#3A2A24" stroke-width="4"><circle cx="34" cy="22" r="9" fill="#6FD08C"/><circle cx="66" cy="22" r="9" fill="#6FD08C"/><circle cx="50" cy="34" r="20" fill="#6FD08C"/><ellipse cx="50" cy="70" rx="24" ry="24" fill="#6FD08C"/><circle cx="26" cy="58" r="8" fill="#6FD08C"/><circle cx="74" cy="58" r="8" fill="#6FD08C"/><circle cx="34" cy="90" r="9" fill="#6FD08C"/><circle cx="66" cy="90" r="9" fill="#6FD08C"/></g><circle cx="43" cy="32" r="3" fill="#3A2A24"/><circle cx="57" cy="32" r="3" fill="#3A2A24"/><path d="M45 41 Q50 45 55 41" stroke="#3A2A24" stroke-width="3" fill="none" stroke-linecap="round"/><ellipse cx="40" cy="62" rx="6" ry="10" fill="#fff" opacity=".45"/></svg>`,
+    icecream:`<svg viewBox="0 0 100 100"><path d="M30 50 L50 97 L70 50 Z" fill="#E5A45B" stroke="#3A2A24" stroke-width="4" stroke-linejoin="round"/><path d="M36 58 L60 58 M40 68 L57 68 M44 78 L55 78 M40 52 L55 84 M60 52 L47 84" stroke="#9C6435" stroke-width="2"/><circle cx="40" cy="42" r="15" fill="#7FD1B9" stroke="#3A2A24" stroke-width="4"/><circle cx="60" cy="42" r="15" fill="#F7A3C0" stroke="#3A2A24" stroke-width="4"/><circle cx="50" cy="24" r="15" fill="#FFF3D6" stroke="#3A2A24" stroke-width="4"/><circle cx="50" cy="9" r="5" fill="#EE5A72" stroke="#3A2A24" stroke-width="3"/></svg>`,
+    candy:`<svg viewBox="0 0 100 100"><rect x="46" y="56" width="8" height="42" rx="3" fill="#fff" stroke="#3A2A24" stroke-width="3"/><circle cx="50" cy="36" r="30" fill="#FFD25E" stroke="#3A2A24" stroke-width="4"/><clipPath id="lolly"><circle cx="50" cy="36" r="27"/></clipPath><path clip-path="url(#lolly)" d="M50 36 m0 -4 a4 4 0 1 1 -4 4 a10 10 0 1 1 10 -10 a16 16 0 1 1 -16 16 a22 22 0 1 1 22 -22" fill="none" stroke="#EE5A72" stroke-width="5" stroke-linecap="round"/></svg>`,
+    choco:`<svg viewBox="0 0 100 100"><rect x="22" y="8" width="56" height="86" rx="4" fill="#6B3E2A" stroke="#3A2A24" stroke-width="4"/><g stroke="#4A2A1C" stroke-width="3"><path d="M22 30 H78 M22 52 H78 M50 8 V94"/></g><g fill="#835036"><rect x="27" y="13" width="18" height="12" rx="2"/><rect x="55" y="13" width="18" height="12" rx="2"/><rect x="27" y="35" width="18" height="12" rx="2"/><rect x="55" y="35" width="18" height="12" rx="2"/></g><path d="M20 58 L80 54 L80 96 L20 96 Z" fill="#C9D3DC" stroke="#3A2A24" stroke-width="4" stroke-linejoin="round"/><rect x="20" y="66" width="60" height="16" fill="#EE5A72"/><text x="50" y="79" text-anchor="middle" font-family="Jua,sans-serif" font-size="12" fill="#fff">초콜릿</text></svg>`
+  };
+  const ITEMS = [
+    {id:'snack',    name:'과자',     sound:'바삭바삭', say:'과자 주세요!',     x:14},
+    {id:'jelly',    name:'젤리',     sound:'말랑말랑', say:'젤리도 담자!',     x:32},
+    {id:'icecream', name:'아이스크림', sound:'차갑고 시원해', say:'아이스크림 최고!', x:50},
+    {id:'candy',    name:'사탕',     sound:'달콤달콤', say:'사탕 하나만!',     x:68},
+    {id:'choco',    name:'초콜릿',   sound:'달달해요', say:'초콜릿도 좋아!',   x:86},
+  ];
+
+  const $ = id => document.getElementById(id);
+  const stage=$('stage'), kid=$('kid'), bubble=$('bubble'), word=$('word'), basket=$('basket'), chips=$('chips');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let soundOn = true, runId = 0, busy = false, kidX = 12;
+  const got = new Set();
+
+  // shelf
+  const shelf = $('shelfItems');
+  ITEMS.forEach(it=>{
+    const el=document.createElement('div');
+    el.className='item'; el.id='item-'+it.id; el.style.left=it.x+'%';
+    el.tabIndex=0; el.setAttribute('role','button'); el.setAttribute('aria-label',it.name+' 담기');
+    el.innerHTML=ART[it.id];
+    const tag=document.createElement('div'); tag.className='tag'; tag.style.left=it.x+'%'; tag.textContent=it.name;
+    shelf.append(el,tag);
+    const pick=()=>{ if(!busy && !got.has(it.id)){ $('cover').hidden=true; runOne(it, ++runId); } };
+    el.addEventListener('click',pick);
+    el.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault();pick();} });
+  });
+
+  const wait = (ms,id) => new Promise((res,rej)=>setTimeout(()=> id!==runId ? rej('stop') : res(), reduce?Math.min(ms,300):ms));
+
+  function speak(text){
+    if(!soundOn || !('speechSynthesis' in window)) return;
+    try{
+      speechSynthesis.cancel();
+      const u=new SpeechSynthesisUtterance(text); u.lang='ko-KR'; u.rate=0.9; u.pitch=1.35;
+      const v=speechSynthesis.getVoices().find(v=>v.lang&&v.lang.startsWith('ko')); if(v) u.voice=v;
+      speechSynthesis.speak(u);
+    }catch(e){}
+  }
+  let actx;
+  function ding(){
+    if(!soundOn) return;
+    try{
+      actx = actx || new (window.AudioContext||window.webkitAudioContext)();
+      [660,990].forEach((f,i)=>{
+        const o=actx.createOscillator(), g=actx.createGain(), t=actx.currentTime+i*0.09;
+        o.frequency.value=f; o.type='triangle';
+        g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.25,t+0.02); g.gain.exponentialRampToValueAtTime(0.0001,t+0.35);
+        o.connect(g).connect(actx.destination); o.start(t); o.stop(t+0.4);
+      });
+    }catch(e){}
+  }
+
+  function moveKid(x){
+    kid.classList.toggle('left', x < kidX);
+    kid.classList.add('walking');
+    kid.style.left = x+'%'; bubble.style.left = x+'%';
+    kidX = x;
+  }
+  function say(t){ bubble.textContent=t; bubble.classList.add('show'); }
+  function showWord(it){ $('wordBig').textContent=it.name; $('wordSub').textContent=it.sound; word.classList.add('show'); }
+
+  function flyToBasket(it){
+    const el=$('item-'+it.id);
+    const a=el.getBoundingClientRect(), b=basket.getBoundingClientRect();
+    const dx=(b.left+b.width/2)-(a.left+a.width/2), dy=(b.top+b.height/2)-(a.top+a.height/2);
+    el.style.transform=`translate(calc(-50% + ${dx}px), calc(-100% + ${dy}px)) scale(.4) rotate(20deg)`;
+  }
+  function addToCart(it){
+    $('item-'+it.id).classList.add('gone');
+    const m=document.createElement('div'); m.className='mini'; m.innerHTML=ART[it.id]; basket.append(m);
+    got.add(it.id);
+    chips.querySelector('.empty')?.remove();
+    const c=document.createElement('button'); c.type='button'; c.className='chip';
+    c.innerHTML=ART[it.id]+'<span>'+it.name+'</span>'; c.title=it.name+' 다시 듣기';
+    c.addEventListener('click',()=>speak(it.name+'! '+it.sound));
+    chips.append(c);
+  }
+
+  async function runOne(it,id){
+    busy=true;
+    try{
+      word.classList.remove('show'); bubble.classList.remove('show'); kid.classList.remove('happy');
+      moveKid(it.x); await wait(1150,id); kid.classList.remove('walking');
+      const el=$('item-'+it.id); el.classList.add('glow');
+      say(it.say); speak(it.say); await wait(900,id);
+      kid.classList.add('reach'); await wait(450,id);
+      el.classList.remove('glow'); flyToBasket(it); await wait(750,id);
+      addToCart(it); ding(); kid.classList.remove('reach'); kid.classList.add('happy');
+      showWord(it); speak(it.name+'! '+it.sound); await wait(1900,id);
+    } finally { busy=false; kid.classList.remove('walking','reach'); }
+    if(got.size===ITEMS.length && id===runId) finale(id);
+  }
+
+  async function finale(id){
+    try{
+      word.classList.remove('show');
+      moveKid(50); await wait(1150,id); kid.classList.remove('walking');
+      kid.classList.add('happy');
+      say('다 샀다! 맛있겠다!'); speak('다 샀다! 맛있겠다!'); await wait(2600,id);
+      bubble.classList.remove('show');
+      $('cover').querySelector('p').textContent='장보기 끝! 다시 볼까요?';
+      $('bigPlay').textContent='↻ 다시 보기';
+      $('cover').hidden=false;
+    }catch(e){}
+  }
+
+  function reset(){
+    runId++; busy=false; got.clear(); speechSynthesis?.cancel?.();
+    basket.innerHTML=''; chips.innerHTML='<span class="empty">아직 비어 있어요.</span>';
+    ITEMS.forEach(it=>{ const el=$('item-'+it.id); el.classList.remove('gone','glow'); el.style.transform=''; });
+    kid.className='kid'; kidX=12; kid.style.left='12%'; bubble.style.left='12%';
+    bubble.classList.remove('show'); word.classList.remove('show');
+  }
+
+  async function playAll(){
+    reset(); $('cover').hidden=true;
+    const id=runId;
+    try{
+      say('간식 사러 가자!'); speak('간식 사러 가자!'); await wait(1600,id);
+      for(const it of ITEMS){ if(id!==runId) return; await runOne(it,id); }
+    }catch(e){}
+  }
+
+  $('bigPlay').addEventListener('click',playAll);
+  $('playBtn').addEventListener('click',playAll);
+  $('soundBtn').addEventListener('click',e=>{
+    soundOn=!soundOn; e.currentTarget.setAttribute('aria-pressed',soundOn);
+    e.currentTarget.textContent = soundOn ? '🔊 소리 켜짐' : '🔇 소리 꺼짐';
+    if(!soundOn) try{speechSynthesis.cancel()}catch(err){}
+  });
+  if('speechSynthesis' in window){ try{ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged=()=>{}; }catch(e){} }
+})();
+</script>
