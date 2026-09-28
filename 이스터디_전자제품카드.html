@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>이스터디 전자제품 카드</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Noto+Sans+KR:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FFF8F5;--white:#FFFFFF;
+  --pink:#F48FB1;--pink-light:#FCE4EC;--pink-mid:#F06292;
+  --mint:#80CBC4;--mint-light:#E0F2F1;--mint-dark:#00695C;
+  --text:#4A3728;--text2:#7B6355;--text3:#A89080;
+  --border:#F0E6DF;
+  --shadow-sm:0 2px 12px rgba(180,100,80,0.08);
+  --shadow-md:0 6px 24px rgba(180,100,80,0.13);
+  --radius:18px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Nunito','Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;}
+.page-header{background:var(--white);border-bottom:2px solid var(--border);padding:1.25rem 1rem;}
+.inner{max-width:1100px;margin:0 auto;}
+.brand{font-size:13px;font-weight:900;color:var(--pink-mid);}
+.ph-title{font-size:22px;font-weight:900;}
+.ph-title span{color:var(--pink-mid);}
+.ph-desc{font-size:13px;color:var(--text3);margin-top:3px;}
+.content-wrap{padding:1.5rem 1rem 3rem;}
+.action-bar{display:flex;align-items:center;gap:10px;margin-bottom:1.5rem;flex-wrap:wrap;}
+.flip-all-btn{font-family:inherit;font-size:13px;font-weight:800;padding:8px 20px;border-radius:30px;border:2px solid var(--mint);background:transparent;color:var(--mint-dark);cursor:pointer;transition:all .18s;}
+.flip-all-btn:hover{background:var(--mint);color:var(--white);}
+.badge{font-size:12px;font-weight:800;background:var(--mint-light);color:var(--mint-dark);padding:5px 14px;border-radius:20px;border:1.5px solid var(--mint);}
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;}
+.flashcard{perspective:800px;height:210px;cursor:pointer;}
+.card-inner{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .45s cubic-bezier(.4,0,.2,1);}
+.flashcard.flipped .card-inner{transform:rotateY(180deg);}
+.card-face,.card-back{position:absolute;inset:0;border-radius:var(--radius);backface-visibility:hidden;-webkit-backface-visibility:hidden;display:flex;flex-direction:column;align-items:center;overflow:hidden;}
+.card-face{justify-content:flex-end;background:#f4f1ee;border:2px solid var(--border);box-shadow:var(--shadow-sm);}
+.card-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .5s ease;}
+.flashcard:hover .card-photo{transform:scale(1.07);}
+.eng-label{position:relative;z-index:1;width:100%;padding:24px 8px 10px;text-align:center;font-size:14px;font-weight:900;line-height:1.3;color:#fff;background:linear-gradient(to top,rgba(0,0,0,.72),rgba(0,0,0,0));text-shadow:0 1px 3px rgba(0,0,0,.5);}
+.card-face.no-photo{justify-content:center;background:linear-gradient(145deg,#FFF8F5,#FFF3EE);}
+.card-face.no-photo .card-photo{display:none;}
+.card-face.no-photo .eng-label{background:none;color:var(--text);text-shadow:none;padding:0 8px;font-size:17px;}
+.card-back{justify-content:center;padding:.75rem;background:var(--white);transform:rotateY(180deg);border:2px solid var(--pink);box-shadow:var(--shadow-md);}
+.kor-big{font-family:'Noto Sans KR',sans-serif;font-size:24px;font-weight:900;text-align:center;line-height:1.25;}
+.rom-text{font-size:12px;font-weight:800;color:var(--pink-mid);margin-top:4px;}
+.eng-text{font-size:12px;color:var(--text3);margin-top:2px;}
+.credit{margin-top:2rem;font-size:11px;color:var(--text3);text-align:center;}
+.credit a{color:inherit;}
+@media (max-width:600px){.cards-grid{grid-template-columns:repeat(2,1fr);gap:10px;}.flashcard{height:175px;}.kor-big{font-size:20px;}}
+</style>
+</head>
+<body>
+<header class="page-header"><div class="inner">
+  <div class="brand">이스터디 영어교실</div>
+  <div class="ph-title">📺 한국 <span>전자제품 카드</span></div>
+  <div class="ph-desc">사진 카드를 탭하면 한국어 이름이 나와요! 우리 집에서 쓰는 전자제품 20개</div>
+</div></header>
+<main class="content-wrap"><div class="inner">
+  <div class="action-bar">
+    <button class="flip-all-btn" id="flipAllBtn" onclick="flipAll()">모두 뒤집기 ↺</button>
+    <span class="badge">20개 단어</span>
+  </div>
+  <div class="cards-grid">
+<div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="card-inner">
+ <div class="card-face"><img class="card-photo" src="https://commons.wikimedia.org/wiki/Special:FilePath/2020-03-27_13.50.55_CUCKOO_rice_cooker.jpg?width=500" alt="전기밥솥" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.classList.add('no-photo')"><span class="eng-label">rice cooker</span></div>
+ <div class="card-back"><div class="kor-big">전기밥솥</div><div class="rom-text">jeongi bapsot</div><div class="eng-text">rice cooker</div></div>
+</div></div>
+<div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="card-inner">
+ <div class="card-face"><img class="card-photo" src="https://commons.wikimedia.org/wiki/Special:FilePath/Kimchi_refrigerator.jpg?width=500" alt="김치냉장고" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.classList.add('no-photo')"><span class="eng-label">kimchi refrigerator</span></div>
+ <div class="card-back"><div class="kor-big">김치냉장고</div><div class="rom-text">gimchi naengjanggo</div><div class="eng-text">kimchi refrigerator</div></div>
+</div></div>
+<div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="card-inner">
+ <div class="card-face"><img class="card-photo" src="https://commons.wikimedia.org/wiki/Special:FilePath/Front_loader_Washing_machine.jpg?width=500" alt="세탁기" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.classList.add('no-photo')"><span class="eng-label">washing machine</span></div>
+ <div class="card-back"><div class="kor-big">세탁기</div><div class="rom-text">setakgi</div><div class="eng-text">washing machine</div></div>
+</div></div>
+<div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="card-inner">
+ <div class="card-face"><img class="card-photo" src="https://commons.wikimedia.org/wiki/Special:FilePath/Modern_front_load_tumble_dryer.JPG?width=500" alt="건조기" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.classList.add('no-photo')"><span class="eng-label">clothes dryer</span></div>
+ <div class="card-back"><div class="kor-big">건조기</div><div class="rom-text">geonjogi</div><div class="eng-text">clothes dryer</div></div>
+</div></div>
+<div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="card-inner">
+ <div class="card-face"><img class="card-photo" src="https://commons.wikimedia.org/wiki/Special:FilePath/DAIKIN_AIR_CONDITIONER_INDOOR_UNIT.jpg?width=500" alt="에어컨" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.classList.add('no-photo')"><span class="eng-label">air conditioner</span></div>
+ <div class="card-back"><div class="kor-big">에어컨</div><div class="rom-text">eeokeon</div><div class="eng-text">air conditioner</div></div>
+</div></div>
+<div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="card-inner">
+ <div class="card-face"><img class="card-photo" src="https://commons.wikimedia.org/wiki/Special:FilePath/Microwave_oven.jpg?width=500" alt="전자레인지" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.classList.add('no-photo')"><span class="eng-label">microwave oven</span></div>
+ <div class="card-back"><div class="kor-big">전자레인지</div><div class="rom-text">jeonja reinji</div><div class="eng-text">microwave oven</div></div>
+</div></div>
+<div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="card-inner">
+ <div class="card-face"><img class="card-photo" src="https://commons.wikimedia.org/wiki/Special:FilePath/Winix_air_purifier_p_series.jpg?width=500" alt="공기청정기" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.classList.add('no-photo')"><span class="eng-label">air purifier</span></div>
+ <div class="card-back"><div class="kor-big">공기청정기</div><div class="rom-text">gonggi cheongjeonggi</div><div class="eng-text">air purifier</div></div>
+</div></div>
+<div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="card-inner">
+ <div class="card-face"><img class="card-photo" src="https://commons.wikimedia.org/wiki/Special:FilePath/Smart_Toilet_Seat.jpg?width=500" alt="비데" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.classList.add('no-photo')"><span class="eng-label">bidet</span></div>
+ <div class="card-back"><div class="kor-big">비데</div><div class="rom-text">bide</div><div class="eng-text">bidet</div></div>
+</div></div>
+<div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="card-inner">
+ <div class="card-face"><img class="card-photo" src="https://commons.wikimedia.org/wiki/Special:FilePath/Samsung_Electric_Fan.JPG?width=500" alt="선풍기" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.classList.add('no-photo')"><span class="eng-label">electric fan</span></div>
+ <div class="card-back"><div class="kor-big">선풍기</div><div class="rom-text">seonpunggi</div><div class="eng-text">electric fan</div></div>
+</div></div>
+<div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="card-inner">
+ <div class="card-face"><img class="card-photo" src="https://en.wikipedia.org/wiki/Special:FilePath/Robot_vacuum_cleaner.jpg?width=500" alt="로봇청소기" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.classList.add('no-photo')"><span class="eng-label">robot vacuum</span></div>
+ <div class="card-back"><div class="kor-big">로봇청소기</div><div class="rom-text">robot cheongsogi</div><div class="eng-text">robot vacuum</div></div>
+</div></div>
+<div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="card-inner">
+ <div class="card-face"><img class="card-photo" src="https://commons.wikimedia.org/wiki/Special:FilePath/Vacuum_cleaner.jpg?width=500" alt="청소기" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.classList.add('no-photo')"><span class="eng-label">vacuum cleaner</span></div>
+ <div class="card-back"><div class="kor-big">청소기</div><div class="rom-text">cheongsogi</div><div class="eng-text">vacuum cleaner</div></div>
+</div></div>
+<div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="card-inner">
+ <div class="card-face"><img class="card-photo" src="https://commons.wikimedia.org/wiki/Special:FilePath/Samsung_Galaxy_Android_Smartphone.jpg?width=500" alt="스마트폰" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.classList.add('no-photo')"><span class="eng-label">smartphone</span></div>
+ <div class="card-back"><div class="kor-big">스마트폰</div><div class="rom-text">seumateupon</div><div class="eng-text">smartphone</div></div>
+</div></div>
+<div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="card-inner">
+ <div class="card-face"><img class="card-photo" src="https://commons.wikimedia.org/wiki/Special:FilePath/LG_smart_TV.jpg?width=500" alt="텔레비전" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.classList.add('no-photo')"><span class="eng-label">television</span></div>
+ <div class="card-back"><div class="kor-big">텔레비전</div><div class="rom-text">tellebijeon</div><div class="eng-text">television</div></div>
+</div></div>
+<div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="card-inner">
+ <div class="card-face"><img class="card-photo" src="https://commons.wikimedia.org/wiki/Special:FilePath/Electric-kettle.jpg?width=500" alt="전기포트" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.classList.add('no-photo')"><span class="eng-label">electric kettle</span></div>
+ <div class="card-back"><div class="kor-big">전기포트</div><div class="rom-text">jeongi poteu</div><div class="eng-text">electric kettle</div></div>
+</div></div>
+<div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="card-inner">
+ <div class="card-face"><img class="card-photo" src="https://commons.wikimedia.org/wiki/Special:FilePath/Hair_dryer_picture.jpg?width=500" alt="드라이기" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.classList.add('no-photo')"><span class="eng-label">hair dryer</span></div>
+ <div class="card-back"><div class="kor-big">드라이기</div><div class="rom-text">deuraigi</div><div class="eng-text">hair dryer</div></div>
+</div></div>
+<div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="card-inner">
+ <div class="card-face"><img class="card-photo" src="https://commons.wikimedia.org/wiki/Special:FilePath/Air_Fryer_2020.jpg?width=500" alt="에어프라이어" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.classList.add('no-photo')"><span class="eng-label">air fryer</span></div>
+ <div class="card-back"><div class="kor-big">에어프라이어</div><div class="rom-text">eeo peuraieo</div><div class="eng-text">air fryer</div></div>
+</div></div>
+<div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="card-inner">
+ <div class="card-face"><img class="card-photo" src="https://commons.wikimedia.org/wiki/Special:FilePath/Ultrasonic_humidifier.jpg?width=500" alt="가습기" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.classList.add('no-photo')"><span class="eng-label">humidifier</span></div>
+ <div class="card-back"><div class="kor-big">가습기</div><div class="rom-text">gaseupgi</div><div class="eng-text">humidifier</div></div>
+</div></div>
+<div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="card-inner">
+ <div class="card-face"><img class="card-photo" src="https://commons.wikimedia.org/wiki/Special:FilePath/Dishwasher_open_for_loading.jpg?width=500" alt="식기세척기" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.classList.add('no-photo')"><span class="eng-label">dishwasher</span></div>
+ <div class="card-back"><div class="kor-big">식기세척기</div><div class="rom-text">sikgi secheokgi</div><div class="eng-text">dishwasher</div></div>
+</div></div>
+<div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="card-inner">
+ <div class="card-face"><img class="card-photo" src="https://commons.wikimedia.org/wiki/Special:FilePath/Laptop_computer.jpg?width=500" alt="노트북" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.classList.add('no-photo')"><span class="eng-label">laptop</span></div>
+ <div class="card-back"><div class="kor-big">노트북</div><div class="rom-text">noteubuk</div><div class="eng-text">laptop</div></div>
+</div></div>
+<div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="card-inner">
+ <div class="card-face"><img class="card-photo" src="https://commons.wikimedia.org/wiki/Special:FilePath/MIA_induction_stove_IKP2201.JPG?width=500" alt="인덕션" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.classList.add('no-photo')"><span class="eng-label">induction cooktop</span></div>
+ <div class="card-back"><div class="kor-big">인덕션</div><div class="rom-text">indeoksyeon</div><div class="eng-text">induction cooktop</div></div>
+</div></div>
+  </div>
+  <p class="credit">사진 출처: <a href="https://commons.wikimedia.org/" target="_blank" rel="noopener">Wikimedia Commons</a> (CC 라이선스)</p>
+</div></main>
+<script>
+let flippedAll=false;
+function flipAll(){
+  flippedAll=!flippedAll;
+  document.querySelectorAll('.flashcard').forEach(fc=>fc.classList.toggle('flipped',flippedAll));
+  document.getElementById('flipAllBtn').textContent=flippedAll?'모두 닫기 ↺':'모두 뒤집기 ↺';
+}
+</script>
+</body>
+</html>
